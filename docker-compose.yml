@@ -1,0 +1,49 @@
+services:
+  ursim:
+    build:
+      context: .
+      dockerfile: Dockerfile.ursim
+    environment:
+      - ROBOT_MODEL=UR5
+    ports:
+      - "6080:6080"
+      - "30001-30004:30001-30004"
+      - "50002:50002"
+    networks:
+      ur_net:
+        ipv4_address: 172.20.0.2
+
+
+  ur_driver:
+    build:
+      context: .
+      dockerfile: Dockerfile.ur_driver
+    environment:
+      - ROBOT_IP=172.20.0.2
+      - UR_TYPE=ur5e
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - CYCLONEDDS_URI=file:///config/cyclone_dds.xml
+    ports:
+      - "7400-7430:7400-7430/udp"
+    depends_on:
+      - ursim
+    volumes:
+      - ./cyclone_dds.xml:/config/cyclone_dds.xml:ro
+      - ./entrypoint.sh:/entrypoint.sh:ro
+    networks:
+      ur_net:
+        ipv4_address: 172.20.0.3
+    # Needed for real-time scheduling
+    privileged: true
+    ulimits:
+      rtprio: 99
+      memlock:
+        soft: -1
+        hard: -1
+
+networks:
+  ur_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
