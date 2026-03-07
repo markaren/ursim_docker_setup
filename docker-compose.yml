@@ -1,7 +1,7 @@
 services:
   ursim:
     build:
-      context: .
+      context: ./docker_files
       dockerfile: Dockerfile.ursim
     environment:
       - ROBOT_MODEL=UR5
@@ -19,14 +19,14 @@ services:
 
   ur_driver:
     build:
-      context: .
+      context: ./docker_files
       dockerfile: Dockerfile.ur_driver
     environment:
       - ROBOT_IP=172.20.0.2
       - UR_TYPE=ur5e
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     volumes:
-      - ./driver_entrypoint.sh:/entrypoint.sh:ro
+      - ./docker_files/driver_entrypoint.sh:/entrypoint.sh:ro
     # Docker Desktop host networking: container uses Windows network stack directly
     # Requires "Enable host networking" in Docker Desktop settings (already enabled)
     networks:
@@ -42,7 +42,7 @@ services:
 
   ros2_dev:
     build:
-      context: .
+      context: ./docker_files
       dockerfile: Dockerfile.ros2_dev
     environment:
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
@@ -54,7 +54,7 @@ services:
       # WSLg sockets for X11/Wayland GUI support
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /mnt/wslg:/mnt/wslg:rw
-      - ./dev_entrypoint.sh:/entrypoint.sh:ro
+      - ./docker_files/dev_entrypoint.sh:/entrypoint.sh:ro
     networks:
       ur_net:
         ipv4_address: 172.20.0.4
