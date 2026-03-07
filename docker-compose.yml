@@ -7,9 +7,14 @@ services:
       - ROBOT_MODEL=UR5
     ports:
       - "6080:6080"
+      # UR robot control ports — needed so ur_driver (host network) can reach ursim
+      - "29999:29999"
+      - "30001-30004:30001-30004"
+      # 50001-50002 are NOT exposed: ur_driver (host-networked) listens on 50001;
+      # ursim connects outbound to reverse_ip:50001 — no inbound mapping needed
     networks:
       ur_net:
-        ipv4_address: 172.20.0.2
+        ipv4_address: 172.22.0.2
 
 
   ur_driver:
@@ -17,17 +22,15 @@ services:
       context: .
       dockerfile: Dockerfile.ur_driver
     environment:
-      - ROBOT_IP=172.20.0.2
+      - ROBOT_IP=127.0.0.1
       - UR_TYPE=ur5e
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-      #- CYCLONEDDS_URI=file:///config/cyclone_dds.xml
-    ports:
-      - "7400-7600:7400-7600/udp"
     depends_on:
       - ursim
     volumes:
-      - ./config/cyclone_dds.xml:/config/cyclone_dds.xml:ro
       - ./entrypoint.sh:/entrypoint.sh:ro
+    # Docker Desktop host networking: container uses Windows network stack directly
+    # Requires "Enable host networking" in Docker Desktop settings (already enabled)
     network_mode: host
     # Needed for real-time scheduling
     privileged: true
@@ -37,9 +40,29 @@ services:
         soft: -1
         hard: -1
 
+  ros2_dev:
+    image: condescending-mestorf-ur_driver
+    environment:
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      # WSLg display forwarding (works with Docker Desktop on Windows)
+      - DISPLAY=${DISPLAY:-:0}
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
+      - XDG_RUNTIME_DIR=/tmp/runtime
+    volumes:
+      - ~/ros2_ws:/ros2_ws
+      # WSLg sockets for X11/Wayland GUI support
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /mnt/wslg:/mnt/wslg:rw
+    network_mode: host
+    stdin_open: true
+    tty: true
+    entrypoint: ["/bin/bash", "-c", "source /opt/ros/jazzy/setup.bash && bash"]
+    depends_on:
+      - ur_driver
+
 networks:
   ur_net:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/16
+        - subnet: 172.22.0.0/16

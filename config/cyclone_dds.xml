@@ -3,18 +3,15 @@
 
     <General>
       <AllowMulticast>false</AllowMulticast>
-      <NetworkInterfaceAddress>auto</NetworkInterfaceAddress>
     </General>
 
     <Discovery>
-	<ParticipantIndex>auto</ParticipantIndex>
+      <ParticipantIndex>auto</ParticipantIndex>
       <Peers>
-		<Peer address="localhost"/>
+        <!-- Windows host IP: shared by ur_driver (host network) and pixi ROS2 -->
         <Peer address="192.168.1.53"/>
-        <Peer address="172.31.32.1"/>
-		<Peer address="192.168.1.1"/>
-		<Peer address="172.20.0.3"/>
-		<Peer address="host.docker.internal"/>
+        <!-- Loopback: needed for local participant discovery when multicast is off -->
+        <Peer address="127.0.0.1"/>
       </Peers>
     </Discovery>
 
