@@ -7,8 +7,6 @@ services:
       - ROBOT_MODEL=UR5
     ports:
       - "6080:6080"
-      - "30001-30004:30001-30004"
-      - "50002:50002"
     networks:
       ur_net:
         ipv4_address: 172.20.0.2
@@ -22,17 +20,15 @@ services:
       - ROBOT_IP=172.20.0.2
       - UR_TYPE=ur5e
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-      - CYCLONEDDS_URI=file:///config/cyclone_dds.xml
+      #- CYCLONEDDS_URI=file:///config/cyclone_dds.xml
     ports:
-      - "7400-7430:7400-7430/udp"
+      - "7400-7600:7400-7600/udp"
     depends_on:
       - ursim
     volumes:
-      - ./cyclone_dds.xml:/config/cyclone_dds.xml:ro
+      - ./config/cyclone_dds.xml:/config/cyclone_dds.xml:ro
       - ./entrypoint.sh:/entrypoint.sh:ro
-    networks:
-      ur_net:
-        ipv4_address: 172.20.0.3
+    network_mode: host
     # Needed for real-time scheduling
     privileged: true
     ulimits:
