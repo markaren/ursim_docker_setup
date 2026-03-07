@@ -18,6 +18,14 @@ Currently unable to connect to ROS node from outside of docker, however, a devel
 
 ## Usage
 
+We first build a base image for `ur_driver` and `ros2_dev` containers:
+
+```bash
+docker build -t ros_ur_base:latest -f Dockerfile.base .
+```
+
+To start the application framework, do:
+
 ```bash
 docker compose up --build
 ```
@@ -28,8 +36,8 @@ Wait a few seconds for URSim to boot and `ur_driver` to connect. The first build
 
 User interface: http://localhost:6080/vnc.html
 
-1. Start robot from lower left menu option and exit menu.
-2. Navigate to Innstallation ->  URCaps -> External Control. Insert `172.20.0.3` as the Host IP.
+1. Power ON and START the robot from lower left menu option. Then exit menu.
+2. Navigate to Installation ->  URCaps -> External Control. Insert `172.20.0.3` as the Host IP.
 3. Navigate to Program. Click URCaps/External Control.
 4. Navigate to Run. Press play.
 
