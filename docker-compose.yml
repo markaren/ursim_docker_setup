@@ -1,4 +1,11 @@
 services:
+  base:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    image: ros_ur_base:latest
+    command: ["true"]
+
   ursim:
     build:
       context: .
@@ -26,7 +33,10 @@ services:
       - UR_TYPE=ur5e
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     depends_on:
-      - ursim
+      base:
+        condition: service_completed_successfully
+      ursim:
+        condition: service_started
     volumes:
       - ./driver_entrypoint.sh:/entrypoint.sh:ro
     # Docker Desktop host networking: container uses Windows network stack directly
@@ -63,7 +73,10 @@ services:
     stdin_open: true
     tty: true
     depends_on:
-      - ur_driver
+      base:
+        condition: service_completed_successfully
+      ur_driver:
+        condition: service_started
 
 networks:
   ur_net:
