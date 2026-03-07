@@ -6,7 +6,7 @@ Currently unable to connect to ROS node from outside of docker, however, a devel
 ## Requirements
 
 - [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
-- [vcxsrv](https://github.com/marchaesen/vcxsrv) 
+- [vcxsrv](https://github.com/marchaesen/vcxsrv/releases) 
 
 ## Services
 
@@ -29,8 +29,8 @@ Wait a few seconds for URSim to boot and `ur_driver` to connect. The first build
 User interface: http://localhost:6080/vnc.html
 
 1. Start robot from lower left menu option and exit menu.
-2. Navigate to Innstallation ->  URCaps -> External Control. Insert 172.20.0.3 as Host IP.
-3. Navigate to Program. Click URCaps/ External Control.
+2. Navigate to Innstallation ->  URCaps -> External Control. Insert `172.20.0.3` as the Host IP.
+3. Navigate to Program. Click URCaps/External Control.
 4. Navigate to Run. Press play.
 
 
@@ -54,14 +54,14 @@ ros2 topic echo /joint_states --once  # test connectivity
 
 ### Test joint_trajectory_controller 
 
-First move the robot to HOME position within URsim.
+First move the robot to HOME position within URsim, then run:
 ```bash
 ros2 launch ur_robot_driver test_joint_trajectory_controller.launch.py
 ```
 
 ### Using MoveIt
 
-> Note: Run XLaunch on Windows before trying to run GUI apps within the container.
+> Note: Run XLaunch on Windows before trying to run GUI apps within the dev container.
 
 ```bash
 ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur5e launch_rviz:=true
