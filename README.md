@@ -1,13 +1,11 @@
 # Docker setup for ursim + ur_robot_driver
 
-> PS: Currently unable to connect to ROS node from outside of docker.
-
-=======
 This setup runs URSim alongside the `ur_robot_driver`. This allows commanding a simulated UR robot using ROS2.
+Currently unable to connect to ROS node from outside of docker, however, a development container is booted for this purpose.
 
 ## Requirements
 
-- [Docker Desktop for Windows}(https://www.docker.com/products/docker-desktop/)
+- [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
 - [vcxsrv](https://github.com/marchaesen/vcxsrv) 
 
 ## Services
@@ -68,9 +66,3 @@ ros2 launch ur_robot_driver test_joint_trajectory_controller.launch.py
 ```bash
 ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur5e launch_rviz:=true
 ```
-
-## Networking architecture
-
-- `ursim` runs on Docker bridge `ur_net` (172.22.0.2); its UR control ports are TCP-mapped to Windows `localhost`
-- `ur_driver` uses `network_mode: host` (Docker Desktop host networking); connects to URSim via `localhost:30001` etc.
-- `ros2_dev` uses `network_mode: host`; shares the same network namespace as `ur_driver``
