@@ -6,6 +6,6 @@ source /opt/ros/jazzy/setup.bash
 ros2 launch ur_robot_driver ur_control.launch.py \
     ur_type:=${UR_TYPE:-ur5e} \
     robot_ip:=${ROBOT_IP} \
-	reverse_ip:=192.168.1.53 \
+	reverse_ip:=172.20.0.3 \
     launch_rviz:=false \
     initial_joint_controller:=scaled_joint_trajectory_controller

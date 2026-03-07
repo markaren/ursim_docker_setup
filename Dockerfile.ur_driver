@@ -4,7 +4,6 @@ FROM ros:jazzy
 RUN apt-get update && apt-get install -y \
     ros-jazzy-ur-robot-driver \
 	ros-jazzy-ur-description \
-    ros-jazzy-ur-moveit-config \
     ros-jazzy-rmw-cyclonedds-cpp \
     && rm -rf /var/lib/apt/lists/*
 

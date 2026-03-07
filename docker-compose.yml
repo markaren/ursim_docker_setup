@@ -14,7 +14,7 @@ services:
       # ursim connects outbound to reverse_ip:50001 — no inbound mapping needed
     networks:
       ur_net:
-        ipv4_address: 172.22.0.2
+        ipv4_address: 172.20.0.2
 
 
   ur_driver:
@@ -22,16 +22,18 @@ services:
       context: .
       dockerfile: Dockerfile.ur_driver
     environment:
-      - ROBOT_IP=127.0.0.1
+      - ROBOT_IP=172.20.0.2
       - UR_TYPE=ur5e
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     depends_on:
       - ursim
     volumes:
-      - ./entrypoint.sh:/entrypoint.sh:ro
+      - ./driver_entrypoint.sh:/entrypoint.sh:ro
     # Docker Desktop host networking: container uses Windows network stack directly
     # Requires "Enable host networking" in Docker Desktop settings (already enabled)
-    network_mode: host
+    networks:
+      ur_net:
+        ipv4_address: 172.20.0.3
     # Needed for real-time scheduling
     privileged: true
     ulimits:
@@ -41,22 +43,25 @@ services:
         hard: -1
 
   ros2_dev:
-    image: condescending-mestorf-ur_driver
+    build:
+      context: .
+      dockerfile: Dockerfile.ros2_dev
     environment:
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-      # WSLg display forwarding (works with Docker Desktop on Windows)
-      - DISPLAY=${DISPLAY:-:0}
-      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
-      - XDG_RUNTIME_DIR=/tmp/runtime
+      # Points to the Windows host's VcXsrv — host.docker.internal resolves to
+      # the Windows host IP from inside a Docker Desktop container
+      - DISPLAY=host.docker.internal:0.0
+      - LIBGL_ALWAYS_INDIRECT=0
     volumes:
-      - ~/ros2_ws:/ros2_ws
       # WSLg sockets for X11/Wayland GUI support
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /mnt/wslg:/mnt/wslg:rw
-    network_mode: host
+      - ./dev_entrypoint.sh:/entrypoint.sh:ro
+    networks:
+      ur_net:
+        ipv4_address: 172.20.0.4
     stdin_open: true
     tty: true
-    entrypoint: ["/bin/bash", "-c", "source /opt/ros/jazzy/setup.bash && bash"]
     depends_on:
       - ur_driver
 
@@ -65,4 +70,4 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.22.0.0/16
+        - subnet: 172.20.0.0/16

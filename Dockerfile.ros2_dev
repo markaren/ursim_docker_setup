@@ -1,0 +1,13 @@
+FROM ros:jazzy
+
+# GUI and development tools
+RUN apt-get update && apt-get install -y \
+    ros-jazzy-ur-robot-driver \
+	ros-jazzy-ur-moveit-config \
+	ros-jazzy-ur-description \
+    ros-jazzy-rviz2 \
+    ros-jazzy-rqt \
+	ros-jazzy-rmw-cyclonedds-cpp \
+    && rm -rf /var/lib/apt/lists/*
+
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
